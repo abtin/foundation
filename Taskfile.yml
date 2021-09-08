@@ -1,0 +1,32 @@
+# https://taskfile.dev
+
+version: '3'
+
+tasks:
+
+  build.frontend:
+    desc: Build Svelte frontend
+    cmds:
+      - cd web && npm run build
+
+  run.frontend:
+    desc: Run Frontend
+    deps:
+      - build.frontend
+    cmds:
+      - cd web && npm run dev -- --open
+
+  build.server:
+    desc: Build app server
+    cmds:
+      - go build -o cmd/webserver/webserver cmd/webserver/main.go
+
+  run.server:
+    desc: Run app server
+    deps:
+      - build
+    cmds:
+      - cd cmd/webserver && ./webserver
+
+  build.docker:
+    desc: Build docker image of the webserver
