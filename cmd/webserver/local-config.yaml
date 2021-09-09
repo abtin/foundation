@@ -1,0 +1,15 @@
+webserver:
+  address: "127.0.0.1"
+  port: 8888
+  name: "web-app"
+
+auth:
+  tokenDuration: "5m"
+  cookieDuration: "24h"
+
+# use env var to replace the following
+JWT_SECRET_KEY: "secret"
+GITHUB_CLIENT_ID: "abtin"
+GITHUB_CLIENT_SECRET: "ABCDEF"
+
+

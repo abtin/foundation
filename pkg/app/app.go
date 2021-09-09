@@ -1,14 +1,13 @@
 package app
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
+	"foundation/pkg/auth"
 	"foundation/pkg/config"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
 )
 
 // Server has configuration
@@ -23,16 +22,29 @@ func NewServer(config config.Config) Server {
 	}
 }
 
-// Run srarts the server
+// Run starts the server
 func (s Server) Run() error {
-	r := chi.NewRouter()
-	r.Use(middleware.Logger)
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("welcome"))
-	})
-	port := fmt.Sprintf(":%d", s.Config.Port)
-	log.Printf("Listening on Port %d\n", s.Config.Port)
-	if err := http.ListenAndServe(port, r);err != nil {
+	// setup http server
+	router := chi.NewRouter()
+	router.Get("/public",
+		func(w http.ResponseWriter, r *http.Request) {
+			_, _ = w.Write([]byte("open to everyone"))
+		})
+
+	authService := auth.NewGithubAuth(s.Config)
+	m := authService.Middleware()
+	router.With(m.Auth).Get("/private",
+		func(w http.ResponseWriter, r *http.Request) {
+			_, _ = w.Write([]byte("only if you are logged in!"))
+		})
+
+	//setup auth routes
+	authRoutes, avaRoutes := authService.Handlers()
+	router.Mount("/auth", authRoutes)
+	router.Mount("/avatar", avaRoutes)
+
+	log.Printf("Listening on  %s\n", s.Config.WebServerURL())
+	if err := http.ListenAndServe(s.Config.WebServerURL(), router); err != nil {
 		if err != http.ErrServerClosed {
 			return err
 		}

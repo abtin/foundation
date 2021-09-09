@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	cfg, err := config.FromFile("./dev-config.toml")
+	cfg, err := config.FromFile("./local-config.yaml")
 	if err != nil {
 		log.Fatalf("%s\n", err)
 	}

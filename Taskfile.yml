@@ -19,14 +19,15 @@ tasks:
   build.server:
     desc: Build app server
     cmds:
+      - golangci-lint run
       - go build -o cmd/webserver/webserver cmd/webserver/main.go
 
   run.server:
     desc: Run app server
     deps:
-      - build
+      - build.server
     cmds:
-      - cd cmd/webserver && ./webserver
+      - source scripts/secrets.sh && cd cmd/webserver && ./webserver
 
   build.docker:
     desc: Build docker image of the webserver

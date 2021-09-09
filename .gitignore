@@ -1,2 +1,4 @@
 .idea/
 build/
+cmd/webserver/webserver
+scripts/secrets.sh
